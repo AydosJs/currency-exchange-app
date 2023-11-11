@@ -37,22 +37,11 @@ export default function ConvertPanel() {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [from]);
-
-  useEffect(() => {
-    setOptions(Object.keys(info));
-    convert();
-  }, [info]);
-
   const convert = () => {
     setOutput(Number(input) * Number(info[to as keyof typeof info]));
   };
 
   const flip = () => {
-    console.log("called");
-
     setFrom(to);
     setTo(from);
   };
@@ -63,11 +52,24 @@ export default function ConvertPanel() {
     convert();
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [from]);
+
+  useEffect(() => {
+    setOptions(Object.keys(info));
+    convert();
+  }, [info]);
+
+  useEffect(() => {
+    convert()
+  }, [from, to]);
+
   return (
     <div className="p-4 border rounded-md">
       <div className="p-4 mb-4 border rounded-md">
         <p className="text-xl font-medium ">
-          {input + " " + from + " = " + output.toFixed(2) + " " + to}
+          {input.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + from + " = " + output.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + to}
         </p>
       </div>
 
@@ -89,7 +91,7 @@ export default function ConvertPanel() {
             >
               {!isLoading &&
                 options?.map((item, index) => (
-                  <Option key={index} value={item}>
+                  <Option key={`${index * 100}`} value={item}>
                     {item}
                   </Option>
                 ))}
@@ -131,7 +133,7 @@ export default function ConvertPanel() {
             >
               {!isLoading &&
                 options?.map((item, index) => (
-                  <Option key={index} value={item}>
+                  <Option key={`${index * 100}`} value={item}>
                     {item}
                   </Option>
                 ))}
