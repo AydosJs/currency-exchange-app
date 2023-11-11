@@ -1,5 +1,7 @@
 import Axios from "axios";
 import { useEffect, useState } from "react";
+import LoadingText from "./progress-indicators/LoadingText";
+import Label from "./select/Label";
 
 type IResult = {
   CNY: number
@@ -43,15 +45,14 @@ export default function CurrenciesPanel() {
     fetchList()
   }, [select])
 
-  console.log("!baseCurrencyList?.results", baseCurrencyList)
   return (
     <div className="p-4 border rounded-md">
 
       <div className="flex flex-row w-full mb-4 space-x-4">
         <div className="flex flex-col w-full">
-          <label htmlFor="countries" className="mb-2 font-medium text-gray-400">
+          <Label>
             Counter currency
-          </label>
+          </Label>
           <select
             onChange={(e) => setSelected(e.target.value)}
             id="countries" className="p-2 font-medium border rounded-md ">
@@ -82,11 +83,7 @@ export default function CurrenciesPanel() {
         </div>
       )}
 
-      {loading && (
-        <div className="min-h-[200px] flex justify-center items-center w-full">
-          loading...
-        </div>
-      )}
+      {loading && <LoadingText />}
     </div>
   );
 }
