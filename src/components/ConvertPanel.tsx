@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Axios from "axios";
 import Button from "./form-elements/Button";
 import { Option } from "./form-elements/Option";
@@ -10,23 +10,35 @@ type IInfo = {
 };
 
 export default function ConvertPanel() {
-  const [info, setInfo] = useState<IInfo[]>([]);
-  const [from, setFrom] = useState<string>("usd");
-  const [to, setTo] = useState<string>("uzs");
-  const [input, setInput] = useState<number>(1);
-  const [date, setDate] = useState<string>("");
+  const [info, setInfo] = React.useState<IInfo[]>([]);
 
-  const [options, setOptions] = useState<string[]>([]);
-  const [output, setOutput] = useState<number>(0);
+  const [from, setFrom] = React.useState<string>("usd");
+  const [to, setTo] = React.useState<string>("uzs");
+  const [input, setInput] = React.useState<number>(1);
+
+  const [options, setOptions] = React.useState<string[]>([]);
+  const [output, setOutput] = React.useState<number>(0);
+  const [date, setDate] = React.useState<string>("");
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await Axios.get(
+        `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${from}.json`
+      );
+      setInfo(response.data[from]);
+      setDate(response.data.date);
+      setOptions(Object.keys(response.data[from]));
+    } catch (error) {
+      console.error("Error fetching currency data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    Axios.get(
-      `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${from}.json`
-    ).then((res) => {
-      setInfo(res.data[from]);
-      setDate(res.data.date);
-      setOptions(Object.keys(info));
-    });
+    fetchData();
   }, [from]);
 
   useEffect(() => {
@@ -39,13 +51,20 @@ export default function ConvertPanel() {
   };
 
   const flip = () => {
+    console.log("called");
+
     setFrom(to);
     setTo(from);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    convert();
+  };
+
   return (
     <div className="p-4 border rounded-md">
-
       <div className="p-4 mb-4 border rounded-md">
         <p className="text-xl font-medium ">
           {input + " " + from + " = " + output.toFixed(2) + " " + to}
@@ -53,35 +72,33 @@ export default function ConvertPanel() {
       </div>
 
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          convert();
-        }}
+        onSubmit={handleSubmit}
         className="flex flex-col p-4 pt-1 mb-6 space-y-2 border rounded-md"
       >
         <div className="flex flex-col w-full space-y-4 sm:space-x-4 sm:items-end sm:flex-row">
           <div className="flex flex-col w-full">
             <Label>From</Label>
-            {Boolean(options?.length) && (
-              <select
-                id="countries"
-                className="p-2 font-medium border rounded-md "
-                onChange={(e) => {
-                  setFrom(e.target.value);
-                }}
-                value={from}
-              >
-                {options?.map((item, index) => (
+            <select
+              disabled={isLoading}
+              id="countries"
+              className="p-2 font-medium border rounded-md "
+              onChange={(e) => {
+                setFrom(e.target.value);
+              }}
+              value={from}
+            >
+              {!isLoading &&
+                options?.map((item, index) => (
                   <Option key={index} value={item}>
                     {item}
                   </Option>
                 ))}
-              </select>
-            )}
+            </select>
           </div>
 
-          <Button onClick={() => flip()}
+          <Button
+            type="button"
+            onClick={() => flip()}
             className="sm:w-fit h-[41px]"
           >
             <svg
@@ -103,22 +120,22 @@ export default function ConvertPanel() {
           <div className="flex flex-col w-full">
             <Label>To</Label>
 
-            {Boolean(options?.length) && (
-              <select
-                onChange={(e) => {
-                  setTo(e.target.value);
-                }}
-                value={to}
-                id="countries"
-                className="p-2 font-medium border rounded-md "
-              >
-                {options?.map((item, index) => (
+            <select
+              disabled={isLoading}
+              onChange={(e) => {
+                setTo(e.target.value);
+              }}
+              value={to}
+              id="countries"
+              className="p-2 font-medium border rounded-md "
+            >
+              {!isLoading &&
+                options?.map((item, index) => (
                   <Option key={index} value={item}>
                     {item}
                   </Option>
                 ))}
-              </select>
-            )}
+            </select>
           </div>
         </div>
 
@@ -143,7 +160,6 @@ export default function ConvertPanel() {
       <div className="pt-4 mt-4 text-sm font-medium text-gray-400 border-t">
         Using the data available as of {date}
       </div>
-
     </div>
   );
 }
