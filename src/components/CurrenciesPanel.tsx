@@ -56,8 +56,8 @@ export default function CurrenciesPanel() {
           <select
             onChange={(e) => setSelected(e.target.value)}
             id="countries" className="p-2 font-medium border rounded-md ">
-            {currencies?.map((item, index) => (
-              <option className="font-medium " key={index} value={item}>
+            {currencies?.map((item) => (
+              <option className="font-medium " key={item} value={item}>
                 {item}
               </option>
             ))}
@@ -66,9 +66,9 @@ export default function CurrenciesPanel() {
       </div>
 
       <ul className="grid grid-flow-row grid-cols-1 gap-4 list-none sm:grid-cols-2">
-        {!loading && Object.entries(baseCurrencyList?.results ?? {}).map(([currency, rate], index) => (
+        {!loading && Object.entries(baseCurrencyList?.results ?? {}).map(([currency, rate]) => (
           <li
-            key={index}
+            key={rate}
             className="p-2 text-sm font-semibold bg-gray-100 border rounded-md"
           >
             <span>1.00 {baseCurrencyList?.base} =</span>

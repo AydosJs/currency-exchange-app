@@ -90,8 +90,8 @@ export default function ConvertPanel() {
               value={from}
             >
               {!isLoading &&
-                options?.map((item, index) => (
-                  <Option key={`${index * 100}`} value={item}>
+                options?.map((item) => (
+                  <Option key={item} value={item}>
                     {item}
                   </Option>
                 ))}
@@ -132,8 +132,8 @@ export default function ConvertPanel() {
               className="p-2 font-medium border rounded-md "
             >
               {!isLoading &&
-                options?.map((item, index) => (
-                  <Option key={`${index * 100}`} value={item}>
+                options?.map((item) => (
+                  <Option key={item} value={item}>
                     {item}
                   </Option>
                 ))}
